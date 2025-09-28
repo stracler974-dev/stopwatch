@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <title>MovieFlix - Search</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #000;
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#6a35f1",
+            "footer-bg": "#1e1a31",
+            "brand-purple": "#6a35f1",
+            "footer-text": "#a1a1aa",
+            "icon-bg": "#2d2a44",
+          },
+          fontFamily: {
+            display: ["Montserrat", "sans-serif"],
+          },
+          borderRadius: {
+            DEFAULT: "1rem",
+          },
+        },
+      },
+    };
+  </script>
+</head>
+<body class="text-white flex flex-col min-h-screen">
+  <!-- NAVBAR -->
+  <header class="bg-[#1e1a31]">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <button class="text-white">
+        <span class="material-icons">menu</span>
+      </button>
+
+      <!-- LOGO (Clickable to test.html) -->
+      <a href="test.html" class="flex items-center space-x-1">
+        <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold text-lg">M</div>
+        <h1 class="text-2xl font-bold text-white tracking-tighter">ovieFlix</h1>
+      </a>
+
+      <div class="flex items-center space-x-4">
+        <button id="searchBtn" class="text-white">
+          <span class="material-icons">search</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-grow">
+    <div class="max-w-6xl mx-auto mt-10 px-4 mb-20">
+      <!-- Title -->
+      <h2 id="search-title" class="text-2xl font-bold mb-8">Search results for ""</h2>
+
+      <!-- Results Grid -->
+      <div id="search-results" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8">
+        <!-- Results injected here -->
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-footer-bg text-center py-10 mt-auto">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-center items-center mb-6">
+        <div class="bg-brand-purple w-12 h-12 flex items-center justify-center rounded-lg mr-2">
+          <span class="text-white text-3xl font-bold">M</span>
+        </div>
+        <span class="text-white text-4xl font-bold">MovieFlix</span>
+      </div>
+
+      <p class="text-footer-text text-sm mb-6">
+        Copyright © MovieFlix. All Rights Reserved
+      </p>
+
+      <div class="flex justify-center space-x-4 mb-8">
+        <a class="bg-icon-bg p-3 rounded-md hover:bg-brand-purple transition" href="#">
+          <span class="material-icons">facebook</span>
+        </a>
+        <a class="bg-icon-bg p-3 rounded-md hover:bg-brand-purple transition" href="#">
+          <span class="material-icons">telegram</span>
+        </a>
+        <a class="bg-icon-bg p-3 rounded-md hover:bg-brand-purple transition" href="#">
+          <span class="material-icons">share</span>
+        </a>
+      </div>
+
+      <p class="text-footer-text text-xs leading-relaxed max-w-2xl mx-auto">
+        Disclaimer: This site does not store any files on its server. All contents are provided by non-affiliated third parties.
+      </p>
+    </div>
+  </footer>
+
+  <!-- POPUP SEARCH BAR -->
+  <div id="searchModal" class="fixed inset-0 z-50 hidden flex items-start justify-center mt-20">
+    <div class="w-full max-w-xs">
+      <div class="relative">
+        <input id="modalSearchInput"
+          class="w-full h-11 bg-primary text-white placeholder-gray-300 rounded-full pl-5 pr-5 focus:outline-none focus:ring-2 focus:ring-white text-sm font-normal"
+          placeholder="Enter movie name..."
+          type="text"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT -->
+  <script>
+    const API_KEY = "efa4a3a1fe3389fa70fa59b2802983f4";
+
+    // Get query from URL (?q=batman)
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get("q") || "movie";
+
+    const searchTitle = document.getElementById("search-title");
+    const searchResults = document.getElementById("search-results");
+
+    searchTitle.textContent = `Search results for "${query}"`;
+
+    async function fetchSearchResults(query) {
+      const url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=en-US&query=${encodeURIComponent(query)}&page=1&include_adult=false`;
+      const res = await fetch(url);
+      const data = await res.json();
+      return data.results || [];
+    }
+
+    function renderResults(movies) {
+      searchResults.innerHTML = "";
+      if (!movies || movies.length === 0) {
+        searchResults.innerHTML = `<p class="text-gray-400 col-span-full">No results found.</p>`;
+        return;
+      }
+      movies.forEach(movie => {
+        if (!movie.poster_path) return;
+        const card = document.createElement("div");
+        card.className = "group cursor-pointer";
+        card.innerHTML = `
+          <div class="relative rounded-lg overflow-hidden shadow-xl transition-all duration-300 ease-in-out group-hover:shadow-2xl group-hover:-translate-y-1">
+            <div class="absolute top-2 left-2 bg-black bg-opacity-70 text-white text-xs font-bold px-2 py-1 rounded-md">HD</div>
+            <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" class="w-full h-64 object-cover"/>
+          </div>
+          <div class="mt-2 text-center">
+            <p class="text-sm font-medium text-gray-400 truncate">${movie.title}</p>
+          </div>
+        `;
+
+        // Click to go watch.html with TMDB id and title
+        card.addEventListener("click", () => {
+          const id = movie.id;
+          const title = encodeURIComponent(movie.title || "");
+          window.location.href = `watch.html?id=${id}&title=${title}`;
+        });
+
+        searchResults.appendChild(card);
+      });
+    }
+
+    async function loadResults() {
+      const movies = await fetchSearchResults(query);
+      renderResults(movies);
+    }
+
+    loadResults();
+
+    // --- Popup search bar logic ---
+    const searchBtn = document.getElementById("searchBtn");
+    const searchModal = document.getElementById("searchModal");
+    const modalSearchInput = document.getElementById("modalSearchInput");
+
+    searchBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      searchModal.classList.remove("hidden");
+      modalSearchInput.focus();
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!searchModal.classList.contains("hidden") &&
+          !modalSearchInput.contains(e.target) &&
+          !searchBtn.contains(e.target)) {
+        searchModal.classList.add("hidden");
+      }
+    });
+
+    modalSearchInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        const newQuery = modalSearchInput.value.trim();
+        if (newQuery) {
+          window.location.href = `search.html?q=${encodeURIComponent(newQuery)}`;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
