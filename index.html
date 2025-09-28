@@ -1,227 +1,176 @@
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-  <link href="https://fonts.googleapis.com" rel="preconnect"/>
-  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <script>
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            primary: "#137fec",
-            "background-light": "#f6f7f8",
-            "background-dark": "#101922",
-          },
-          fontFamily: {
-            display: ["Space Grotesk"],
-            sans: ["Inter", "sans-serif"],
-          },
-          borderRadius: {
-            DEFAULT: "0.5rem",
-            lg: "1rem",
-            xl: "1.5rem",
-            full: "9999px",
-          },
-          keyframes: {
-            pulseGlow: {
-              '0%, 100%': { opacity: '1', textShadow: '0 0 5px rgba(255, 255, 255, 0)' },
-              '50%': { opacity: '0.95', textShadow: '0 0 10px rgba(19, 127, 236, 0.5)' },
-            },
-            gradient: {
-              '0%': { backgroundPosition: '0% 50%' },
-              '50%': { backgroundPosition: '100% 50%' },
-              '100%': { backgroundPosition: '0% 50%' },
-            },
-          },
-          animation: {
-            pulseGlow: 'pulseGlow 2s ease-in-out infinite',
-            gradient: 'gradient 15s ease infinite',
-          }
-        },
-      },
-    };
-  </script>
-  <title>Stopwatch</title>
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      overflow: hidden; /* lock whole page */
-      touch-action: manipulation;
+  <meta 
+    name="viewport" 
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+  <title>MovieFlix</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+  <link 
+    rel="stylesheet" 
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" 
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" 
+    crossorigin="anonymous" 
+    referrerpolicy="no-referrer"
+  />
+
+  <style type="text/tailwindcss">
+    :root {
+      --primary-color: #6a35f1;
+      --background-dark: #120f20;
+      --card-dark: #1e1a31;
+      --text-dark: #ffffff;
+      --text-secondary-dark: #a0a0a0;
     }
-    #laps { -webkit-overflow-scrolling: touch; }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      min-height: max(884px, 100dvh);
+    }
   </style>
 </head>
-<body class="bg-background-light dark:bg-gradient-to-br dark:from-background-dark dark:via-[#131d28] dark:to-[#0d151c] dark:bg-[length:200%_200%] dark:animate-gradient font-display text-white">
-<div class="flex flex-col h-screen">
-  <!-- Header -->
-  <header class="relative flex items-center justify-center p-4 flex-shrink-0">
-    <h1 class="text-lg font-bold text-center text-black dark:text-white">Stopwatch</h1>
-    <button class="absolute right-4 p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none" id="theme-toggle">
-      <span class="material-symbols-outlined dark:hidden">dark_mode</span>
-      <span class="material-symbols-outlined hidden dark:inline">light_mode</span>
-    </button>
-  </header>
-
-  <!-- Main -->
-  <main class="flex-grow flex flex-col items-center px-4 pb-4 min-h-0">
-    <!-- Display -->
-    <div class="text-center pt-8">
-      <h2 id="display" class="text-7xl font-bold tracking-tighter text-black dark:text-white animate-pulseGlow">00:00.00</h2>
-    </div>
-
-    <!-- Controls -->
-    <div class="grid grid-cols-2 gap-4 w-full max-w-sm mt-6 mb-4">
-      <button id="lapBtn" class="bg-gray-200 dark:bg-gray-800 text-black dark:text-white font-bold py-4 rounded-full text-lg" disabled>Lap</button>
-      <button id="startStopBtn" class="bg-green-500 text-white font-bold py-4 rounded-full text-lg">Start</button>
-    </div>
-
-    <!-- Reset -->
-    <div class="w-full max-w-sm mb-4">
-      <button id="resetBtn" class="w-full bg-transparent text-gray-500 dark:text-gray-400 font-bold py-4 rounded-full text-lg border border-gray-300 dark:border-gray-700" disabled>Reset</button>
-    </div>
-
-    <!-- Lap History -->
-    <div class="w-full max-w-sm flex-grow flex flex-col min-h-0 
-                bg-white dark:bg-gray-900/50 rounded-xl bg-clip-padding 
-                backdrop-filter backdrop-blur-xl bg-opacity-60 
-                dark:bg-opacity-20 border border-gray-200 dark:border-gray-800">
-      <div class="sticky top-0 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm z-10">
-        <div class="grid grid-cols-3 gap-4 px-4 py-3 text-sm font-bold 
-                    text-black dark:text-white border-b border-gray-200 
-                    dark:border-gray-800 font-sans text-lg items-center">
-          <span class="text-left font-extrabold col-span-2">Lap History</span>
-          <button id="clearAllBtn" class="text-right text-xs font-medium text-red-500 hover:text-red-400 justify-self-end">Clear All</button>
+<body class="bg-[var(--background-dark)] text-[var(--text-dark)]">
+  <div class="min-h-screen flex flex-col">
+    
+    <!-- Header -->
+    <header class="bg-[var(--card-dark)]">
+      <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <button class="text-[var(--text-dark)]">
+          <span class="material-icons">menu</span>
+        </button>
+        <div class="flex items-center space-x-1">
+          <div class="w-8 h-8 bg-[var(--primary-color)] rounded-full flex items-center justify-center text-white font-bold text-lg">M</div>
+          <h1 class="text-2xl font-bold text-[var(--text-dark)] tracking-tighter">ovieFlix</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+          <button class="text-[var(--text-dark)]">
+            <span class="material-icons">search</span>
+          </button>
         </div>
       </div>
+    </header>
 
-      <!-- SCROLLABLE LAPS -->
-      <div id="laps" class="flex-grow min-h-0 overflow-y-auto divide-y divide-gray-200 dark:divide-gray-800 font-sans">
-        <!-- Lap rows injected here -->
+    <!-- Main -->
+    <main class="flex-grow bg-[var(--background-dark)] text-white pt-10 pb-4 px-4">
+      <div class="container mx-auto flex flex-col items-center">
+
+        <!-- Logo -->
+        <div class="flex items-center space-x-1 mb-8">
+          <div class="w-12 h-12 bg-[var(--primary-color)] rounded-full flex items-center justify-center text-white font-bold text-2xl">M</div>
+          <h1 class="text-4xl font-bold text-white tracking-tighter">ovieFlix</h1>
+        </div>
+
+        <!-- Search -->
+        <div class="w-full flex justify-center mb-6">
+          <form id="searchForm" class="flex w-full max-w-md">
+            <input id="searchInput" class="flex-1 bg-[#1e1a31] text-white placeholder-gray-400 px-4 py-3 rounded-l-full border-0 focus:ring-0" placeholder="Enter movie name..." type="text"/>
+            <button type="submit" class="bg-[var(--primary-color)] px-4 py-3 rounded-r-full flex items-center justify-center">
+              <span class="material-icons text-white">search</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Subtitle -->
+        <p class="text-center text-[#a0a0a0] mb-6 text-sm font-medium">MovieFlix - Just a better place to watch movies online for free!</p>
+
+        <!-- Share Buttons -->
+        <div class="flex items-center space-x-3 mb-4">
+          <span class="text-gray-400 font-medium">778K Shares</span>
+          <button class="bg-[#0088cc] w-10 h-10 flex items-center justify-center rounded-md">
+            <i class="fa-brands fa-telegram text-white text-xl"></i>
+          </button>
+          <button class="bg-black w-10 h-10 flex items-center justify-center rounded-md">
+            <i class="fa-brands fa-x-twitter text-white text-xl"></i>
+          </button>
+          <button class="bg-[#1877f2] w-10 h-10 flex items-center justify-center rounded-md">
+            <i class="fa-brands fa-facebook-f text-white text-xl"></i>
+          </button>
+          <button class="bg-[#e60023] w-10 h-10 flex items-center justify-center rounded-md">
+            <i class="fa-brands fa-pinterest text-white text-xl"></i>
+          </button>
+        </div>
+
+        <!-- Connect -->
+        <div class="flex items-center space-x-2 mb-8">
+          <i class="fa-brands fa-twitter text-blue-400 text-2xl"></i>
+          <span class="text-blue-400 font-medium">Connect with us on Twitter</span>
+        </div>
+
+        <!-- CTA -->
+        <a href="test.html" class="w-full max-w-md bg-[var(--primary-color)] text-white font-bold py-3 rounded-full mb-8 text-center block">
+          Go to home page
+        </a>
+
+        <!-- Info -->
+        <div class="text-center text-[#a0a0a0] text-sm space-y-4 font-medium max-w-md">
+          <p>MovieFlix is a free movie website where millions visit to watch movies online.</p>
+          <p>MovieFlix provides users with various genres including Action, Comedy, Drama, Historical, Romance, Thriller, Sci-Fi, Horror, Adventure, etc.</p>
+        </div>
+
+        <!-- Legal Section -->
+        <div class="text-center text-[#a0a0a0] text-sm space-y-4 font-medium max-w-3xl mt-10">
+          <h2 class="text-lg font-semibold text-white">Legal & Safety Information</h2>
+          <p>MovieFlix does not host any files on its own servers. All media files are provided by third-party services and are freely available on the internet.</p>
+          <p>We strongly encourage users to support the film industry by purchasing official releases or subscribing to legal streaming services whenever possible.</p>
+          <p>MovieFlix is intended for personal use only. We do not claim ownership of any movie or video content displayed on the site.</p>
+          <p>By using MovieFlix, you agree to our terms and acknowledge that MovieFlix is not responsible for the content provided by external sources.</p>
+        </div>
+
       </div>
-    </div>
-  </main>
-</div>
+    </main>
 
-<audio id="lap-sound" preload="auto" src="https://cdn.pixabay.com/audio/2022/03/15/audio_51c721a117.mp3"></audio>
+    <!-- ===== FOOTER ===== -->
+    <footer class="bg-footer-bg text-center py-8 bg-[#1e1a31] mt-12">
+      <div class="container mx-auto px-4">
+        
+        <!-- Logo -->
+        <div class="flex justify-center items-center mb-6">
+          <div class="bg-[var(--primary-color)] w-12 h-12 flex items-center justify-center rounded-lg mr-2">
+            <span class="text-white text-3xl font-bold">M</span>
+          </div>
+          <span class="text-white text-4xl font-bold">ovieFlix</span>
+        </div>
 
-<script>
-  // Timer state
-  let startTime = 0, elapsed = 0, timerInterval = null;
-  let lapCount = 0, lastLapTime = 0;
-  let laps = [];
+        <!-- Copyright -->
+        <p class="text-[#a0a0a0] text-sm mb-6">
+          Copyright © MovieFlix. All Rights Reserved
+        </p>
 
-  // Elements
-  const display = document.getElementById("display");
-  const startStopBtn = document.getElementById("startStopBtn");
-  const lapBtn = document.getElementById("lapBtn");
-  const resetBtn = document.getElementById("resetBtn");
-  const lapsContainer = document.getElementById("laps");
-  const clearAllBtn = document.getElementById("clearAllBtn");
-  const sound = document.getElementById("lap-sound");
+        <!-- Social Icons -->
+        <div class="flex justify-center space-x-4 mb-8">
+          <a class="bg-[#333] p-3 rounded-md hover:bg-[var(--primary-color)] transition" href="#"><i class="fab fa-twitter text-white text-xl"></i></a>
+          <a class="bg-[#333] p-3 rounded-md hover:bg-[var(--primary-color)] transition" href="#"><i class="fab fa-telegram text-white text-xl"></i></a>
+          <a class="bg-[#333] p-3 rounded-md hover:bg-[var(--primary-color)] transition" href="#"><i class="fab fa-reddit text-white text-xl"></i></a>
+        </div>
 
-  function formatTime(ms) {
-    const totalSeconds = Math.floor(ms / 1000);
-    const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
-    const seconds = String(totalSeconds % 60).padStart(2, "0");
-    const centiseconds = String(Math.floor((ms % 1000) / 10)).padStart(2, "0");
-    return `${minutes}:${seconds}.${centiseconds}`;
-  }
+        <!-- Disclaimer -->
+        <p class="text-[#a0a0a0] text-xs leading-relaxed max-w-2xl mx-auto">
+          Disclaimer: This site does not store any files on its server. All contents are provided by non-affiliated third parties.
+        </p>
+      </div>
+    </footer>
 
-  function updateTime() {
-    elapsed = Date.now() - startTime;
-    display.textContent = formatTime(elapsed);
-  }
+  </div>
 
-  function renderLaps() {
-    lapsContainer.innerHTML = "";
-    for (let i = laps.length - 1; i >= 0; i--) {
-      const lap = laps[i];
-      const div = document.createElement("div");
-      div.className = "grid grid-cols-3 gap-4 px-4 py-3 items-center text-black dark:text-white";
-      div.innerHTML = `
-        <span class="text-left font-medium">Lap ${lap.id}</span>
-        <span class="text-center">+${formatTime(lap.lapTime)}</span>
-        <span class="text-right">${formatTime(lap.total)}</span>
-      `;
-      lapsContainer.appendChild(div);
-    }
-    // Keep newest visible
-    lapsContainer.scrollTop = 0;
-  }
+  <script>
+    // connect search form to search.html
+    const searchForm = document.getElementById("searchForm");
+    const searchInput = document.getElementById("searchInput");
 
-  // Start/Stop
-  startStopBtn.addEventListener("click", () => {
-    navigator.vibrate?.(10);
-
-    if (timerInterval) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-      startStopBtn.textContent = "Start";
-      startStopBtn.classList.remove("bg-red-500");
-      startStopBtn.classList.add("bg-green-500");
-      lapBtn.disabled = true;
-      resetBtn.disabled = false;
-    } else {
-      startTime = Date.now() - elapsed;
-      timerInterval = setInterval(updateTime, 10);
-      startStopBtn.textContent = "Stop";
-      startStopBtn.classList.remove("bg-green-500");
-      startStopBtn.classList.add("bg-red-500");
-      lapBtn.disabled = false;
-      resetBtn.disabled = false;
-    }
-  });
-
-  // Lap
-  lapBtn.addEventListener("click", () => {
-    navigator.vibrate?.(10);
-    if (!timerInterval) return;
-    sound.currentTime = 0;
-    sound.play().catch(()=>{});
-
-    lapCount++;
-    const lapTime = elapsed - lastLapTime;
-    lastLapTime = elapsed;
-    laps.push({ id: lapCount, lapTime, total: elapsed });
-    renderLaps();
-  });
-
-  // Reset
-  resetBtn.addEventListener("click", () => {
-    navigator.vibrate?.(10);
-    clearInterval(timerInterval);
-    timerInterval = null;
-    elapsed = 0; startTime = 0;
-    lapCount = 0; lastLapTime = 0; laps = [];
-    display.textContent = "00:00.00";
-    lapsContainer.innerHTML = "";
-    startStopBtn.textContent = "Start";
-    startStopBtn.classList.remove("bg-red-500");
-    startStopBtn.classList.add("bg-green-500");
-    lapBtn.disabled = true;
-    resetBtn.disabled = true;
-  });
-
-  // Clear All laps
-  clearAllBtn.addEventListener("click", () => {
-    navigator.vibrate?.(10);
-    laps = [];
-    lapCount = 0;
-    lastLapTime = 0;
-    lapsContainer.innerHTML = "";
-  });
-
-  // Theme toggle
-  document.getElementById('theme-toggle').addEventListener('click', () => {
-    document.documentElement.classList.toggle('dark');
-  });
-</script>
+    searchForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const query = searchInput.value.trim();
+      if (query) {
+        window.location.href = `search.html?q=${encodeURIComponent(query)}`;
+      }
+    });
+  </script>
 </body>
 </html>
