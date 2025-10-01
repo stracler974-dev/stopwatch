@@ -1,6 +1,10 @@
 {
   "theme": "white",
   "showMessage": true,
-  "message": "🔥 Hello from Bibek to you my nigga!",
-  "showLapButton": false
+  "message": "🔥 Hello from Bibek!",
+  "showLapButton": false,
+  "blockedIds": [
+    "1234567890abcdef",
+    "abcdef9876543210"
+  ]
 }
