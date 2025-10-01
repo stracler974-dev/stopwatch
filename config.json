@@ -1,9 +1,12 @@
 {
   "maintenance_mode": false,
-  "show_announcement": true,
   "announcement": {
-    "title": "🚀 Welcome!",
-    "message": "This is your first GitHub-controlled notification 🎉"
+    "enabled": true,
+    "title": "🚀 Big Update",
+    "message": "Dark mode is now available! Enjoy 🎉"
   },
-  "collect_stats": true
+  "update_required": false,
+  "features": {
+    "stopwatch": true
+  }
 }
