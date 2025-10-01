@@ -1,12 +1,6 @@
 {
-  "maintenance_mode": false,
-  "announcement": {
-    "enabled": true,
-    "title": "🚀 Big Update",
-    "message": "Dark mode is now available! Enjoy 🎉"
-  },
-  "update_required": false,
-  "features": {
-    "stopwatch": true
-  }
+  "theme": "dark",
+  "showMessage": true,
+  "message": "🔥 Hello from GitHub! Stopwatch is live.",
+  "showLapButton": true
 }
