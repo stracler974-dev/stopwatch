@@ -1,4 +1,9 @@
 {
-  "maintenance": false,
-  "message": "I am updating something. Please try tomorrow."
+  "maintenance_mode": false,
+  "show_announcement": true,
+  "announcement": {
+    "title": "🚀 Welcome!",
+    "message": "This is your first GitHub-controlled notification 🎉"
+  },
+  "collect_stats": true
 }
